@@ -43,23 +43,23 @@ each method, so you only need to override the ones you really need.
 
 The methods you'll probably be overriding are:
 
-	//
-	// Called when a start element is encountered. `name' contains name of
-	// the element, and `attrs' element's attributes. `attrs' is an array
-	// of strings, each a pair with the attribute name first, with its
-	// value in the element following.
-	//
-	void OnStartElement(const XML_Char* name, const XML_Char** attrs);
+    //
+    // Called when a start element is encountered. `name' contains name of
+    // the element, and `attrs' element's attributes. `attrs' is an array
+    // of strings, each a pair with the attribute name first, with its
+    // value in the element following.
+    //
+    void OnStartElement(const XML_Char* name, const XML_Char** attrs);
 
-	//
-	// Called when an end element is encountered. See above.
-	//
-	void OnEndElement(const XML_Char* name);
+    //
+    // Called when an end element is encountered. See above.
+    //
+    void OnEndElement(const XML_Char* name);
 
-	//
-	// A block of plain text.
-	//
-	void OnCharacterData(const XML_Char* data, int len);
+    //
+    // A block of plain text.
+    //
+    void OnCharacterData(const XML_Char* data, int len);
 
 The rest you'll probably never need.
 
@@ -68,31 +68,31 @@ XMLEvtHandler to an instance of XMLParser. Where `filename' is the XML file
 to load and `pHandler' is some implementation of XMLEvtHandler for reading
 some kind of XML file, you'd read a file something like this:
 
-	void LoadXMLFile(const char* filename, XMLEvtHandler* pHandler)
-	{
-		// Arbitrary-sized buffer for holding a block of the file
-		// while we're parsing.
-		char buf[BUFSIZ];
+    void LoadXMLFile(const char* filename, XMLEvtHandler* pHandler)
+    {
+        // Arbitrary-sized buffer for holding a block of the file
+        // while we're parsing.
+        char buf[BUFSIZ];
 
-		// Create and initialise an instance of the parser.
-		XMLParser parser(pHandler);
-		parser.EnableElementHandler();
-		parser.EnableCharacterDataHandler();
+        // Create and initialise an instance of the parser.
+        XMLParser parser(pHandler);
+        parser.EnableElementHandler();
+        parser.EnableCharacterDataHandler();
 
-		// Load the XML file.
-		FILE*  fh    = fopen(filename, "r");
-		bool   atEnd = false;
-		size_t nRead;
-		while (!atEnd)
-		{
-			// Read a block from the XML file and pass it to the
-			// parser.
-			nRead = fread(buf, 1, BUFSIZ, fh);
-			atEnd = feof(fh);
-			parser.Parse(buf, nRead, atEnd);
-		}
-		fclose(fh);
-	}
+        // Load the XML file.
+        FILE*  fh    = fopen(filename, "r");
+        bool   atEnd = false;
+        size_t nRead;
+        while (!atEnd)
+        {
+            // Read a block from the XML file and pass it to the
+            // parser.
+            nRead = fread(buf, 1, BUFSIZ, fh);
+            atEnd = feof(fh);
+            parser.Parse(buf, nRead, atEnd);
+        }
+        fclose(fh);
+    }
 
 The method most of interest above is XMLParser::Parse(buf, len, atEnd). This
 takes three arguments: `buf' is a buffer containing character data to parse,
@@ -111,7 +111,7 @@ Contacting
 I don't give out my email address anymore due to spam, but I do have a contact
 form on my website. You can email me from:
 
-	http://talideon.com/about/contact.cfm
+    http://talideon.com/about/contact.cfm
 
 Don't worry if I don't get back immediately. I'll probably be too busy, but be
 assured that I'll be feeling guilty about not mailing back. I'm not kidding!
