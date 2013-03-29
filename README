@@ -1,0 +1,158 @@
+
+                          XMLParser and XMLEvtHandler
+                          ===========================
+
+                    A C++ Wrapper for the Expat XML Parser
+                                by Keith Gaughan
+
+Background
+==========
+
+Last year when I was writing Orpheus, I needed something to parse XML files.
+The Expat parser seemed like the best fit to the project, and was the easiest
+to integrate into the project, having a SAX-like API.
+
+However, I didn't want to hardwire my callbacks and decided to write a wrapper
+library that would make subsequent use much simpler.
+
+So I wrote the XMLParser and XMLEvtHandler classes. XMLParser is a thin--very
+thin--wrapper around Expat.
+
+
+Requirements
+============
+
+The Expat parser.
+
+
+Basic Usage
+===========
+
+You really, really ought to read the Expat documentation. That's the most
+important thing to do first. Build it, and include the library on your link
+path.
+
+Again, read the Expat documentation. Each of the methods on XMLParser has a
+corresponding (or closely corresponding) procedure in the Expat API.
+
+There are two classes in the library. The XMLEvtHandler consists of a bunch of
+callback methods, which are to be overridden to respond to various events that
+occur over the course of parsing the file. You must subclass this so as you
+can read the contents of the file. There are default empty implementations for
+each method, so you only need to override the ones you really need.
+
+The methods you'll probably be overriding are:
+
+	//
+	// Called when a start element is encountered. `name' contains name of
+	// the element, and `attrs' element's attributes. `attrs' is an array
+	// of strings, each a pair with the attribute name first, with its
+	// value in the element following.
+	//
+	void OnStartElement(const XML_Char* name, const XML_Char** attrs);
+
+	//
+	// Called when an end element is encountered. See above.
+	//
+	void OnEndElement(const XML_Char* name);
+
+	//
+	// A block of plain text.
+	//
+	void OnCharacterData(const XML_Char* data, int len);
+
+The rest you'll probably never need.
+
+Once you've subclassed it, you need to pass your implementation of
+XMLEvtHandler to an instance of XMLParser. Where `filename' is the XML file
+to load and `pHandler' is some implementation of XMLEvtHandler for reading
+some kind of XML file, you'd read a file something like this:
+
+	void LoadXMLFile(const char* filename, XMLEvtHandler* pHandler)
+	{
+		// Arbitrary-sized buffer for holding a block of the file
+		// while we're parsing.
+		char buf[BUFSIZ];
+
+		// Create and initialise an instance of the parser.
+		XMLParser parser(pHandler);
+		parser.EnableElementHandler();
+		parser.EnableCharacterDataHandler();
+
+		// Load the XML file.
+		FILE*  fh    = fopen(filename, "r");
+		bool   atEnd = false;
+		size_t nRead;
+		while (!atEnd)
+		{
+			// Read a block from the XML file and pass it to the
+			// parser.
+			nRead = fread(buf, 1, BUFSIZ, fh);
+			atEnd = feof(fh);
+			parser.Parse(buf, nRead, atEnd);
+		}
+		fclose(fh);
+	}
+
+The method most of interest above is XMLParser::Parse(buf, len, atEnd). This
+takes three arguments: `buf' is a buffer containing character data to parse,
+`len' is the length of the data in the buffer, and `atEnd' if this is the
+last block that needs parsing in the file. Do *not* use strlen() to figure out
+the value to pass in the `len' argument: the buffer may or may not contain
+NULs, and these if present are not string terminators.
+
+That's pretty much it! If you use this in anything, I'd appreciate being told.
+It'd be nifty to know somebody out there was finding it useful.
+
+
+Contacting
+==========
+
+I don't give out my email address anymore due to spam, but I do have a contact
+form on my website. You can email me from:
+
+	http://talideon.com/about/contact.cfm
+
+Don't worry if I don't get back immediately. I'll probably be too busy, but be
+assured that I'll be feeling guilty about not mailing back. I'm not kidding!
+
+
+License and Warranty
+====================
+
+[The following is a slightly modified version of the one on Henry Spencer's
+regex package, which itself is a slight modification of the BSD license. Read
+and enjoy!]
+
+Copyright (c) Keith Gaughan, 2004. All Rights Reserved.
+
+Permission is granted to anyone to use this software for any purpose on any
+computer system, and to alter it and redistribute it, subject to the following
+restrictions:
+
+ 1. The author is not responsible for the consequences of use of this
+    software, no matter how awful, even if they arise from flaws in it.
+
+ 2. The origin of this software must not be misrepresented, either by explicit
+    claim or by omission. Since few users ever read sources, credits must
+    appear in the documentation.
+
+ 3. Altered versions must be plainly marked as such, and must not be
+    misrepresented as being the original software. Since few users ever read
+    sources, credits must appear in the documentation.
+
+ 4. The author reserves the right to change the licencing details on any
+    future releases of this package.
+
+ 5. This notice may not be removed or altered.
+
+
+History
+=======
+
+0.1.0 (2004-03-29)
+First version for Orpheus.
+
+0.1.1 (2005-05-24)
+Slight clean up, added the license, and wrote the basic documentation.
+
